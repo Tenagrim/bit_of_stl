@@ -1,20 +1,15 @@
-/* ************************************************************************** */
-/*                                                                            */
-/*                                                        :::      ::::::::   */
-/*   main.cpp                                           :+:      :+:    :+:   */
-/*                                                    +:+ +:+         +:+     */
-/*   By: gshona <marvin@42.fr>                      +#+  +:+       +#+        */
-/*                                                +#+#+#+#+#+   +#+           */
-/*   Created: 2021/03/20 13:52:45 by gshona            #+#    #+#             */
-/*   Updated: 2021/03/20 13:53:12 by gshona           ###   ########.fr       */
-/*                                                                            */
-/* ************************************************************************** */
 
-#include <List.hpp>
+#include <List2.hpp>
 #include <list>
+
 
 int	main(void)
 {
-	ft::list<int>();
-	return (0);
+	//ft::list<int>();
+
+	ft::list_iterator<int> it;
+
+	ft::list_node<int> node;
+
+	return (0);	
 }

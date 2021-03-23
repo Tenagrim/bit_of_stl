@@ -71,10 +71,29 @@ namespace ft
 		bool		operator!=(const _Self &_x) const {return (_node != _x._node);}
 	};
 
+	template <class T, class Allocator = std::allocator<T> >
+	class _list_base
+	{
+		protected:
+			typedef typename Allocator::template rebind<_List_node<T> >::other	_node_alloc_type;
+
+			struct _list_impl : public _node_alloc_type
+			{
+				_List_node_base	_node;
+				_list_impl(const _node_alloc_type &_a) : _node_alloc_type(_a){}
+			};
+
+			_list_impl		_impl;
+			_List_node<T>	*_get_node(){return _impl._node_alloc_type::allocate(1);}
+			void			_put_node(_List_node<T> *p){_impl._node_alloc_type::deallocate(_p, 1);}
+		public:
+		
+	};
 
 	template <class T, class Allocator = std::allocator<T> >
 	class list
 	{
+
 	public:
 		typedef T												value_type;
 		typedef Allocator										allocator_type;
@@ -83,39 +102,14 @@ namespace ft
 		typedef typename allocator_type::pointer				pointer;
 		typedef typename allocator_type::const_pointer			const_pointer;
 		typedef size_t											size_type;
-		list();
-		~list();
-		list(const ft::list<T, Allocator> &ref);
-		list<T, Allocator> &operator=(const ft::list<T, Allocator> &ref);
+
+		list(){}
+		~list(){}
+		list(const ft::list<T, Allocator> &ref){}
+		list<T, Allocator> &operator=(const ft::list<T, Allocator> &ref){return (*this);}
 
 
 	private:
 		allocator_type								_alloc;
 	};
 }
-
-template <class T, class Allocator>
-ft::list<T, Allocator>::list()
-{
-
-}
-
-template <class T, class Allocator>
-ft::list<T, Allocator>::~list()
-{
-
-}
-
-template <class T, class Allocator>
-ft::list<T, Allocator>::list(const ft::list<T, Allocator> &ref)
-{
-
-}
-
-template <class T, class Allocator>
-ft::list<T, Allocator>	&ft::list<T, Allocator>::operator=(const ft::list<T, Allocator> &ref)
-{
-	return (*this);
-}
-
-
