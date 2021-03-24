@@ -5,11 +5,11 @@
 
 int	main(void)
 {
-	//ft::list<int>();
+	ft::list<int>();
 
-	ft::list_iterator<int> it;
+	//ft::list_iterator<int> it;
 
-	ft::list_node<int> node;
+	//ft::list_node<int> node;
 
 	return (0);	
 }

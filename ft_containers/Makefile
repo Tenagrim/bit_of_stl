@@ -3,7 +3,7 @@ SRC=main.cpp
 HPP=List.hpp List2.hpp
 CC= clang++
 OBJ=$(SRC:.cpp=.o)
-FLAGS= -I . -Wall -Wextra  # -Werror 
+FLAGS= -g -I . -Wall -Wextra  # -Werror 
 
 all: $(NAME)
 
