@@ -1,28 +1,13 @@
-#pragma once
-
-
-/*
+#ifndef NODE_H
+# define NODE_H
 namespace ft
 {
-
-
-
-
+	template<class T>
+	struct Node
+	{
+		Node	*next;
+		Node	*prev;
+		T		*data;
+	};
 }
-ft::list::Node::ft::list::Node()
-{
-}
-
-ft::list::Node::~ft::list::Node()
-{
-}
-
-ft::list::Node::ft::list::Node(const ft::list::Node &ref)
-{
-}
-
-ft::list::Node	&ft::list::Node::operator=(const ft::list::Node &ref)
-{
-	return (*this);
-}
-*/
+#endif
