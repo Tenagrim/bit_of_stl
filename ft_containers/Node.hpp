@@ -8,7 +8,7 @@ namespace ft
 	{
 		Node	*next;
 		Node	*prev;
-		T		*data;
+		T		data;
 	};
 }
 

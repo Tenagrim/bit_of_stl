@@ -28,10 +28,10 @@ namespace ft {
 		node *_begin;
 		node *_end;
 
-		node *_create_node(node *next, node *prev, value_type &data) {
+		node *_create_node(node *next, node *prev, value_type data) {
 			node *res = _node_alloc.allocate(1);
 			res->data = data;
-			re->next = next;
+			res->next = next;
 			res->prev = prev;
 			return res;
 		}
@@ -39,7 +39,7 @@ namespace ft {
 		void _init() {
 			_begin = _create_node(0, 0, value_type());
 			_end = _create_node(0, _begin, value_type());
-			_begin.next = _end;
+			_begin->next = _end;
 		}
 
 	public:
