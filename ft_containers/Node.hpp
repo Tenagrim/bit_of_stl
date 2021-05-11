@@ -1,5 +1,6 @@
 #ifndef NODE_H
 # define NODE_H
+
 namespace ft
 {
 	template<class T>
@@ -10,4 +11,5 @@ namespace ft
 		T		*data;
 	};
 }
+
 #endif
