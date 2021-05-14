@@ -1,21 +1,40 @@
 
 #include <List4.hpp>
 #include <list>
+//#include <list>
 #include <iostream>
 
 int	main(void)
 {
 
+	std::list<int> slist;
 	ft::List<int> list;
 
-	ft::List<int> list2(10);
 
-//	int i = int();
-//	std::cout << i;
 
-	//ft::list_iterator<int> it;
+	std::cout << "std front: " << slist.front() << "\n";
+	std::cout << "std back:  " << slist.back() << "\n";
 
-	//ft::list_node<int> node;
+	std::cout << "my  front: " << list.front() << "\n";
+	std::cout << "my  back:  " << list.back() << "\n";
 
-	return (0);	
+	for(int i = 0 ; i < 10; i++)
+		list.push_back(i + rand() % 10);
+
+	ft::List<int>::iterator it = list.begin();
+	for(; it != list.end(); it++)
+		std::cout << *it << " ]\n";
+
+
+	std::cout << "front: " << list.front() << "\n";
+	std::cout << "back:  " << list.back() << "\n";
+
+	list.sort();
+	ft::List<int> list2 = list;
+
+	it = list2.begin();
+	for(; it != list2.end(); it++)
+		std::cout << *it << " ]\n";
+
+	return (0);
 }
