@@ -4,7 +4,6 @@
 #ifndef FT_CONTAINERS_LIST4_HPP
 # define FT_CONTAINERS_LIST4_HPP
 
-# include "Node.hpp"
 # include "Utils.hpp"
 # include <memory>
 # include <limits>
@@ -12,6 +11,14 @@
 //# include <iostream> // TODO: remove
 
 namespace ft {
+
+	template<class T>
+	struct Node
+	{
+		Node	*next;
+		Node	*prev;
+		T		data;
+	};
 
 #pragma region iterators
 	template<typename T>
@@ -218,6 +225,219 @@ namespace ft {
 		}
 	};
 
+	template<typename T>
+	class ListReverseIterator {
+	private:
+		typedef Node<T> *node_pointer;
+
+		ListReverseIterator() {}
+
+	protected:
+		node_pointer _p;
+	public:
+		typedef T *pointer;
+		typedef T &reference;
+		typedef T value_type;
+
+		~ListReverseIterator() {};
+
+		ListReverseIterator(const ListReverseIterator &other) : _p(other._p) {}
+
+		explicit ListReverseIterator(node_pointer p) : _p(p) {}
+
+		ListReverseIterator &operator=(const ListReverseIterator &other) {
+			this->_p = other._p;
+			return *this;
+		}
+
+		ListReverseIterator &operator++() {
+			_p = _p->prev;
+			return *this;
+		}
+
+		ListReverseIterator &operator--() {
+			_p = _p->next;
+			return *this;
+		}
+
+		ListReverseIterator operator++(int) {
+			ListReverseIterator tmp(*this);
+			_p = _p->prev;
+			return tmp;
+		}
+
+		ListReverseIterator operator--(int) {
+			ListReverseIterator tmp(*this);
+			_p = _p->next;
+			return tmp;
+		}
+
+		bool operator==(const ListReverseIterator &other) {
+			return _p == other._p;
+		}
+
+		node_pointer _node(){return _p;}
+
+		bool operator!=(const ListReverseIterator &other) {
+			return _p != other._p;
+		}
+
+		value_type &operator*() {
+			return _p->data;
+		}
+
+		value_type *operator->() {
+			return _p->data;
+		}
+
+		ListReverseIterator &operator+=(int n) {
+			while (n < 0) {
+				_p = _p->prev;
+				n++;
+			}
+			while (n > 0) {
+				_p = _p->next;
+				n--;
+			}
+			return *this;
+		}
+
+		ListReverseIterator &operator-=(int n) {
+			while (n < 0) {
+				_p = _p->prev;
+				n++;
+			}
+			while (n > 0) {
+				_p = _p->next;
+				n--;
+			}
+			return *this;
+		}
+
+		ListReverseIterator operator+(int n) {
+			ListReverseIterator p(*this);
+			p += n;
+			return p;
+		}
+
+		ListReverseIterator operator-(int n) {
+			ListReverseIterator p(*this);
+			p -= n;
+			return p;
+		}
+
+		ListIterator<value_type> base(){
+			return ListIterator<value_type>(_p);
+		}
+	};
+
+	template<typename T>
+	class ListConstReverseIterator {
+	private:
+		typedef Node<T> *node_pointer;
+
+		ListConstReverseIterator() {}
+
+	protected:
+		node_pointer _p;
+	public:
+		typedef T *pointer;
+		typedef T &reference;
+		typedef T value_type;
+
+		~ListConstReverseIterator() {};
+
+		ListConstReverseIterator(const ListConstReverseIterator &other) : _p(other._p) {}
+
+		explicit ListConstReverseIterator(node_pointer p) : _p(p) {}
+
+		ListConstReverseIterator &operator=(const ListConstReverseIterator &other) {
+			this->_p = other._p;
+			return *this;
+		}
+
+		ListConstReverseIterator &operator++() {
+			_p = _p->prev;
+			return *this;
+		}
+
+		ListConstReverseIterator &operator--() {
+			_p = _p->next;
+			return *this;
+		}
+
+		ListConstReverseIterator operator++(int) {
+			ListConstReverseIterator tmp(*this);
+			_p = _p->prev;
+			return tmp;
+		}
+
+		ListConstReverseIterator operator--(int) {
+			ListConstReverseIterator tmp(*this);
+			_p = _p->next;
+			return tmp;
+		}
+
+		bool operator==(const ListConstReverseIterator &other) {
+			return _p == other._p;
+		}
+
+		node_pointer _node(){return _p;}
+
+		bool operator!=(const ListConstReverseIterator &other) {
+			return _p != other._p;
+		}
+
+		const value_type &operator*() {
+			return _p->data;
+		}
+
+	 	const value_type *operator->() {
+			return _p->data;
+		}
+
+		ListConstReverseIterator &operator+=(int n) {
+			while (n < 0) {
+				_p = _p->prev;
+				n++;
+			}
+			while (n > 0) {
+				_p = _p->next;
+				n--;
+			}
+			return *this;
+		}
+
+		ListConstReverseIterator &operator-=(int n) {
+			while (n < 0) {
+				_p = _p->prev;
+				n++;
+			}
+			while (n > 0) {
+				_p = _p->next;
+				n--;
+			}
+			return *this;
+		}
+
+		ListConstReverseIterator operator+(int n) {
+			ListConstReverseIterator p(*this);
+			p += n;
+			return p;
+		}
+
+		ListConstReverseIterator operator-(int n) {
+			ListConstReverseIterator p(*this);
+			p -= n;
+			return p;
+		}
+
+		ListConstIterator<value_type> base(){
+			return ListConstIterator<value_type>(_p);
+		}
+	};
+
+
 
 #pragma endregion // iterators
 
@@ -232,6 +452,8 @@ namespace ft {
 		typedef size_t size_type;
 		typedef ListIterator<value_type> iterator;
 		typedef ListConstIterator<value_type> const_iterator;
+		typedef ListReverseIterator<value_type> reverse_iterator;
+		typedef ListConstReverseIterator<value_type> const_reverse_iterator;
 	private:
 		typedef Node<value_type> node;
 		typedef typename allocator::template rebind<Node<T> >::other
@@ -377,6 +599,12 @@ namespace ft {
 
 		iterator end() { return iterator(_end); }
 		const_iterator end() const { return const_iterator(_end); }
+
+		reverse_iterator rbegin() { return reverse_iterator(_begin); }
+		const_reverse_iterator rbegin() const{return const_reverse_iterator(_begin);}
+
+		reverse_iterator rend() { return reverse_iterator(_end->prev); }
+		const_reverse_iterator rend() const { return const_reverse_iterator(_end->prev); }
 
 		reference front() { return _begin->next->data; }
 
@@ -602,8 +830,57 @@ namespace ft {
 			other.clear();
 			sort(comp);
 		}
-
 	};
+
+	template< class T, class Alloc >
+	bool operator==( const ft::List<T,Alloc>& lhs,
+					 const ft::List<T,Alloc>& rhs ){
+		if(lhs._len != rhs._len)
+			return false;
+		return true;
+	}
+
+	template< class T, class Alloc >
+	bool operator!=( const ft::List<T,Alloc>& lhs,
+					 const ft::List<T,Alloc>& rhs ){
+		return !(lhs == rhs);
+	}
+
+	template< class T, class Alloc >
+	bool operator<( const ft::List<T,Alloc>& lhs,
+					const ft::List<T,Alloc>& rhs ){
+		typename ft::List<T,Alloc>::const_iterator pl = lhs.begin();
+		typename ft::List<T,Alloc>::const_iterator pr = rhs.begin();
+		while (pl != lhs.end() && pr != rhs.end()){
+			if (*pl < *pr)
+				return true;
+		}
+		return lhs.size() < rhs. size();
+	}
+
+	template< class T, class Alloc >
+	bool operator>( const ft::List<T,Alloc>& lhs,
+					const ft::List<T,Alloc>& rhs ){
+		typename ft::List<T,Alloc>::const_iterator pl = lhs.begin();
+		typename ft::List<T,Alloc>::const_iterator pr = rhs.begin();
+		while (pl != lhs.end() && pr != rhs.end()){
+			if (*pl > *pr)
+				return true;
+		}
+		return lhs.size() > rhs. size();
+	}
+
+	template< class T, class Alloc >
+	bool operator>=( const ft::List<T,Alloc>& lhs,
+					 const ft::List<T,Alloc>& rhs ){
+		return !(lhs < rhs);
+	}
+
+	template< class T, class Alloc >
+	bool operator<=( const ft::List<T,Alloc>& lhs,
+					 const ft::List<T,Alloc>& rhs ){
+		return !(lhs > rhs);
+	}
 }
 
 #endif //FT_CONTAINERS_LIST4_HPP
