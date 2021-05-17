@@ -1,7 +1,6 @@
 //
 // Created by Gerry Shona on 5/11/21.
 //
-
 #ifndef FT_CONTAINERS_LIST4_HPP
 #define FT_CONTAINERS_LIST4_HPP
 
@@ -12,6 +11,7 @@
 
 namespace ft {
 
+#pragma region iterators
 	template<typename T>
 	class ListIterator {
 	private:
@@ -63,6 +63,8 @@ namespace ft {
 			return _p == other._p;
 		}
 
+		node_pointer _node(){return _p;}
+
 		bool operator!=(const ListIterator &other) {
 			return _p != other._p;
 		}
@@ -112,6 +114,111 @@ namespace ft {
 		}
 	};
 
+	template<typename T>
+	class ListConstIterator {
+	private:
+		typedef Node<T> *node_pointer;
+
+		ListConstIterator() {}
+
+	protected:
+		node_pointer _p;
+	public:
+		typedef T *pointer;
+		typedef T &reference;
+		typedef T value_type;
+
+		~ListConstIterator() {};
+
+		ListConstIterator(const ListConstIterator &other) : _p(other._p) {}
+
+		explicit ListConstIterator(node_pointer p) : _p(p) {}
+
+		ListConstIterator &operator=(const ListConstIterator &other) {
+			this->_p = other._p;
+			return *this;
+		}
+
+		ListConstIterator &operator++() {
+			_p = _p->next;
+			return *this;
+		}
+
+		ListConstIterator &operator--() {
+			_p = _p->prev;
+			return *this;
+		}
+
+		ListConstIterator operator++(int) {
+			ListConstIterator tmp(*this);
+			_p = _p->next;
+			return tmp;
+		}
+
+		ListConstIterator operator--(int) {
+			ListConstIterator tmp(*this);
+			_p = _p->prev;
+			return tmp;
+		}
+
+		bool operator==(const ListConstIterator &other) {
+			return _p == other._p;
+		}
+
+		node_pointer _node(){return _p;}
+
+		bool operator!=(const ListConstIterator &other) {
+			return _p != other._p;
+		}
+
+		const value_type &operator*() {
+			return _p->data;
+		}
+
+		const value_type *operator->() {
+			return _p->data;
+		}
+
+		ListConstIterator &operator+=(int n) {
+			while (n < 0) {
+				_p = _p->prev;
+				n++;
+			}
+			while (n > 0) {
+				_p = _p->next;
+				n--;
+			}
+			return *this;
+		}
+
+		ListConstIterator &operator-=(int n) {
+			while (n < 0) {
+				_p = _p->next;
+				n++;
+			}
+			while (n > 0) {
+				_p = _p->prev;
+				n--;
+			}
+			return *this;
+		}
+
+		ListConstIterator operator+(int n) {
+			ListConstIterator p(*this);
+			p += n;
+			return p;
+		}
+
+		ListConstIterator operator-(int n) {
+			ListConstIterator p(*this);
+			p -= n;
+			return p;
+		}
+	};
+
+
+#pragma endregion // iterators
+
 	template<typename T, typename allocator=std::allocator<T> >
 	class List {
 	public:
@@ -122,6 +229,7 @@ namespace ft {
 		typedef allocator allocator_type;
 		typedef size_t size_type;
 		typedef ListIterator<value_type> iterator;
+		typedef ListConstIterator<value_type> const_iterator;
 	private:
 		typedef Node<value_type> node;
 		typedef typename allocator::template rebind<Node<T> >::other
@@ -138,6 +246,11 @@ namespace ft {
 			bool operator()(const P &a, const P &b) { return a > b; }
 		};
 
+		template<class P>
+		struct Pred_equals {
+			bool operator()(const P &a, const P &b) { return a == b; }
+		};
+
 		node *_create_node(node *next, node *prev, value_type data) {
 			node *res = _node_alloc.allocate(1);
 			res->data = data;
@@ -150,6 +263,18 @@ namespace ft {
 			_begin = _create_node(0, 0, value_type());
 			_end = _create_node(0, _begin, value_type());
 			_begin->next = _end;
+		}
+
+		void _unlink(node *n){
+			n->prev->next = n->next;
+			n->next->prev = n->prev;
+		}
+
+		void _delete(node *n)
+		{
+			_unlink(n);
+			_node_alloc.destroy(n);
+			_node_alloc.deallocate(n, 1);
 		}
 
 		template<class Comparator>
@@ -195,6 +320,7 @@ namespace ft {
 		template<class InputIt>
 		void assign(InputIt first, InputIt last) {
 			clear();
+			value_type  tmp = *first;
 			while (first != last)
 				push_back(*(first++));
 		}
@@ -224,26 +350,30 @@ namespace ft {
 		List(const List &other) : _len(other._len)
 		{
 			_init();
-			assign(other._begin->next, other._end->prev);
+			assign(other.begin(), other.end());
 		}
 
 		List &operator=(const List &other)
 		{
 			clear();
-			assign(other._begin->next, other._end->prev);
+			assign(other.begin(), other.end());
 			_len = other._len;
 			return *this;
 		}
 
 		~List() {
 			clear();
+			_node_alloc.destroy(_begin);
 			_node_alloc.deallocate(_begin, 1);
+			_node_alloc.destroy(_end);
 			_node_alloc.deallocate(_end, 1);
 		}
 
 		iterator begin() { return iterator(_begin->next); }
+		const_iterator begin() const{return const_iterator(_begin->next);}
 
 		iterator end() { return iterator(_end); }
+		const_iterator end() const { return const_iterator(_end); }
 
 		reference front() { return _begin->next->data; }
 
@@ -254,6 +384,8 @@ namespace ft {
 			ft::swap(_begin, other._begin);
 			ft::swap(_end, other._end);
 			ft::swap(_len, other._len);
+			ft::swap(_alloc);
+			ft::swap(_node_alloc);
 		}
 
 		bool empty() const {
@@ -270,6 +402,7 @@ namespace ft {
 			while (p != _end) {
 				p2 = p;
 				p = p->next;
+				_node_alloc.destroy(p2);
 				_node_alloc.deallocate(p2, 1);
 			}
 			_begin->next = _end;
@@ -295,6 +428,7 @@ namespace ft {
 			node *p;
 			if (_end->prev != _begin) {
 				p = _end->prev->prev;
+				_node_alloc.destroy(_end->prev);
 				_node_alloc.deallocate(_end->prev, 1);
 				_end->prev = p;
 				p->next = _end;
@@ -306,6 +440,7 @@ namespace ft {
 			node *p;
 			if (_end != _begin->next) {
 				p = _begin->next->next;
+				_node_alloc.destroy(_begin->next);
 				_node_alloc.deallocate(_begin->next, 1);
 				_begin->next = p;
 				p->prev = _begin;
@@ -318,7 +453,7 @@ namespace ft {
 			while (n < _len)
 				pop_back();
 			while (n > _len)
-				push_back(value_type());
+				push_back(value);
 		}
 
 		allocator_type get_allocator() const {
@@ -337,6 +472,48 @@ namespace ft {
 		void sort(Comparator comparator) {
 			quickSort(comparator);
 		};
+
+		iterator erase(iterator pos)
+		{
+			iterator res = pos++;
+			_delete(pos._node());
+			return res;
+		}
+
+		iterator erase(iterator first, iterator last)
+		{
+			iterator res = last++;
+			while (first != last)
+				_delete((first++)._node);
+			return res;
+		}
+
+		void unique()
+		{
+			unique(Pred_equals<value_type>());
+		}
+
+		template< class BinaryPredicate >
+		void unique( BinaryPredicate p )
+		{
+				node *prev = _begin->next;
+				node *next = prev;
+				while(next->next != _end)
+				{
+					next = next->next;
+					if (p(prev->data, next->data))
+					{
+						_delete(next);
+						next = prev;
+					}
+					else
+						prev = next;
+				}
+		}
+
+		void remove(const value_type &value){
+
+		}
 
 	};
 }

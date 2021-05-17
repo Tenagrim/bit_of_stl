@@ -35,6 +35,10 @@ int	main(void)
 	it = list2.begin();
 	for(; it != list2.end(); it++)
 		std::cout << *it << " ]\n";
-
+std::cout << "unique : ===============\n";
+	list2.unique();
+	it = list2.begin();
+	for(; it != list2.end(); it++)
+		std::cout << *it << " ]\n";
 	return (0);
 }
