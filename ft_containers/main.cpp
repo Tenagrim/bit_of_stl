@@ -40,5 +40,22 @@ std::cout << "unique : ===============\n";
 	it = list2.begin();
 	for(; it != list2.end(); it++)
 		std::cout << *it << " ]\n";
+
+	std::cout << "reverse : ===============\n";
+	list2.reverse();
+	it = list2.begin();
+	for(; it != list2.end(); it++)
+		std::cout << *it << " ]\n";
+	std::cout << "===============\n";
+	it = list2.end() - 1;
+	for(; it != list2.begin() - 1; it--)
+		std::cout << *it << " ]\n";
+
+	std::cout << "remove(10) : ===============\n";
+	list2.remove(10);
+	it = list2.begin();
+	for(; it != list2.end(); it++)
+		std::cout << *it << " ]\n";
 	return (0);
+
 }

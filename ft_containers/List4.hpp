@@ -2,12 +2,14 @@
 // Created by Gerry Shona on 5/11/21.
 //
 #ifndef FT_CONTAINERS_LIST4_HPP
-#define FT_CONTAINERS_LIST4_HPP
+# define FT_CONTAINERS_LIST4_HPP
 
 # include "Node.hpp"
-#include "Utils.hpp"
+# include "Utils.hpp"
 # include <memory>
-#include <limits>
+# include <limits>
+
+//# include <iostream> // TODO: remove
 
 namespace ft {
 
@@ -245,7 +247,6 @@ namespace ft {
 		struct Comp_Less {
 			bool operator()(const P &a, const P &b) { return a > b; }
 		};
-
 		template<class P>
 		struct Pred_equals {
 			bool operator()(const P &a, const P &b) { return a == b; }
@@ -355,6 +356,8 @@ namespace ft {
 
 		List &operator=(const List &other)
 		{
+			if (&other == this)
+				return *this;
 			clear();
 			assign(other.begin(), other.end());
 			_len = other._len;
@@ -496,13 +499,12 @@ namespace ft {
 		template< class BinaryPredicate >
 		void unique( BinaryPredicate p )
 		{
-				node *prev = _begin->next;
+				node *prev = _begin;
 				node *next = prev;
 				while(next->next != _end)
 				{
 					next = next->next;
-					if (p(prev->data, next->data))
-					{
+					if (p(prev->data, next->data)){
 						_delete(next);
 						next = prev;
 					}
@@ -512,7 +514,93 @@ namespace ft {
 		}
 
 		void remove(const value_type &value){
+			node	*p = _begin->next;
+			node	*p2 ;
+			while(p != _end ){
+				p2 = p;
+				p = p->next;
+				if(p2->data == value)
+					_delete(p2);
+			}
+		}
 
+		template<class Predicate>
+		void remove_if(Predicate predicate){
+			node	*p = _begin->next;
+			node	*p2 ;
+			while(p != _end ){
+				p2 = p;
+				p = p->next;
+				if(predicate(p2->data))
+					_delete(p2);
+			}
+		}
+
+		void reverse()
+		{
+			node	*p = _begin;
+			while(p != _end ){
+				ft::swap(p->next, p->prev);
+
+				p = p->prev;
+			}
+			ft::swap(_end->next, _end->prev);
+			ft::swap(_begin, _end);
+		}
+
+		iterator insert( iterator pos, const value_type &value ){
+			if (pos._node() == _begin->next)
+			{
+				push_front(value);
+				return (begin());
+			}
+			if (pos._node() == _end)
+			{
+				push_back(value);
+				return (end());
+			}
+		}
+
+		template< class InputIt >
+		void insert( iterator pos, InputIt first, InputIt last){
+			while (first != last)
+			{
+				pos = insert(pos, *(first++));
+				if (pos != end())
+					pos++;
+			}
+		}
+
+		void insert( iterator pos, size_type count, const value_type &value ){
+			while (count--)
+				pos = insert(pos, value);
+		}
+
+		void splice( const_iterator pos, List& other ){
+			splice(pos, other, other.begin(), other.end());
+		}
+
+		void splice( const_iterator pos, List& other, const_iterator it ){
+			insert(pos, *it);
+			other.erase(it);
+		}
+
+		void splice( const_iterator pos, List& other, iterator first, iterator last){
+			insert(pos, first, last);
+			other.erase(first, last);
+		}
+
+		void merge( List& other ){
+			merge(other, Comp_Less<value_type>());
+		}
+
+		template <class Compare>
+		void merge( List& other, Compare comp ){
+			if (&other == this)
+				return;
+			insert(end(), other.begin(), other.end());
+			other.clear();
+			sort(comp);
 		}
 
 	};
