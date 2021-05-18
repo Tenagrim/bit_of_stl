@@ -7,8 +7,6 @@ INCLUDE_DIRECTORIES(ft_containers)
 
 add_executable(ft_containers
         ./ft_containers/main.cpp
-#        ./ft_containers/List.hpp
-#        ./ft_containers/List2.hpp
-        ./ft_containers/Node.hpp
-#        ft_containers/List3.hpp
-        ft_containers/List4.hpp ft_containers/Utils.hpp ft_containers/Utils.hpp ft_containers/Queue.hpp)
+        ft_containers/List.hpp
+        ft_containers/Queue.hpp
+        ft_containers/Stack.hpp)
