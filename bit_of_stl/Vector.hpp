@@ -1,9 +1,8 @@
-//
-// Created by Gerry Shona on 5/19/21.
-//
+#ifndef VECTOR_HPP
+#define VECTOR_HPP
 
-#ifndef FT_CONTAINERS_VECTOR_HPP
-#define FT_CONTAINERS_VECTOR_HPP
+# include <memory>
+# include <limits>
 
 namespace ft {
 
@@ -349,6 +348,7 @@ namespace ft {
 		typedef VectorConstReverseIterator<T>	const_reverse_iterator;
 	private:
 		allocator_type 							_alloc;
+		size_type								_len;
 	public:
 		Vector() {}
 
@@ -362,4 +362,4 @@ namespace ft {
 	};
 }
 
-#endif //FT_CONTAINERS_VECTOR_HPP
+#endif //VECTOR_HPP

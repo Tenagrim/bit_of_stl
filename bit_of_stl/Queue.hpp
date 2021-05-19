@@ -1,9 +1,5 @@
-//
-// Created by Gerry Shona on 5/18/21.
-//
-
-#ifndef FT_CONTAINERS_QUEUE_HPP
-#define FT_CONTAINERS_QUEUE_HPP
+#ifndef QUEUE_HPP
+#define QUEUE_HPP
 
 #include "List.hpp"
 
@@ -88,4 +84,4 @@ namespace ft
 
 }
 
-#endif //FT_CONTAINERS_QUEUE_HPP
+#endif //QUEUE_HPP
