@@ -346,19 +346,162 @@ namespace ft {
 		typedef VectorReverseIterator<T>		reverse_iterator;
 		typedef VectorConstIterator<T>			const_iterator;
 		typedef VectorConstReverseIterator<T>	const_reverse_iterator;
+		typedef T&								reference;
+		typedef const T&						const_reference;
+		typedef T*								pointer;
+		typedef const T*						const_pointer;
 	private:
 		allocator_type 							_alloc;
 		size_type								_len;
+		size_type								_cap;
+		T*										_content;
+
+		void check_out_of_range(size_type n)
+		{
+			if (n >= _len)
+				throw (std::out_of_range("index is out of range"));
+		}
 	public:
-		Vector() {}
+		explicit Vector(const allocator_type &alloc = allocator_type()) :
+		_len(0), _cap(0), _content(0), _alloc(alloc) {}
+		
+		explicit Vector(size_type n, const value_type &value = value_type (),
+				  const allocator_type &alloc = allocator_type()) :
+				_len(0), _cap(0), _content(0), _alloc(alloc) {
+			_content = _alloc.allocate(n);
+			T	*p = _content;
+			while(n--)
+			{
+				_alloc.construct(p, value);
+				_p++;
+			}
+		}
+
+		template<class InputIterator>
+		explicit Vector(InputIterator first, InputIterator last,
+						const allocator_type &alloc = allocator_type()) :
+				_len(0), _cap(0), _content(0), _alloc(alloc) {
+		// TODO: ///////////
+		}
 
 		Vector(const Vector &other) {}
 
 		Vector &operator=(const Vector &other) {}
 
-		~Vector() {}
+		~Vector() { _alloc.deallocate(_content, _len);}
+
+		size_type max_size() const {
+			return std::numeric_limits<size_type>::max();
+		}
+
 		allocator_type get_allocator() const{return _alloc;}
 
+		iterator begin() { return iterator(_content); }
+		const_iterator begin() const{return const_iterator(_content);}
+
+		iterator end() { return iterator(_content + len); }
+		const_iterator end() const { return const_iterator(_content + _len); }
+
+		reverse_iterator rbegin() { return reverse_iterator(_content + _len - 1); }
+		const_reverse_iterator rbegin() const{return const_reverse_iterator(_content + _len - 1);}
+
+		reverse_iterator rend() { return reverse_iterator(_content - 1); }
+		const_reverse_iterator rend() const { return const_reverse_iterator(_content - 1); }
+
+		reference front() { return *_content; }
+
+		reference back() { return *(_content + _len - 1); }
+
+		iterator erase(iterator position)
+		{
+			T	*p1;
+			while(p1 + 1 != _content + len)
+			{
+				*p1 = *(p1 + 1);
+				p1++;
+			}
+			_len--;
+			return iterator(position);
+		}
+
+		iterator erase(iterator first, iterator last)
+		{
+			while(first != last)
+			{
+				erase(first);
+				last--;
+			}
+			return iterator(first);
+		}
+
+		void clear()
+		{
+			for(int i = 0; i < len; i++)
+				_alloc.destroy(_content + i);
+			_len = 0;
+		}
+
+		reference operator[](size_type n){return _content[n];}
+		const_reference operator[](size_type n) const {return _content[n];}
+
+		reference at(size_type n)
+		{
+			check_out_of_range(n)
+			return _content[n];
+		}
+
+		const_reference at(size_type n) const
+		{
+			check_out_of_range(n)
+			return _content[n];
+		}
+
+		void reserve(size_type new_cap)
+		{
+			if (new_cap > max_size())
+				throw (std::length_error("new_cap is too big"))
+			int i = -1;
+			if (new_cap > _cap)
+			{
+				T* tmp = _alloc.allocate(new_cap);
+				while(i++ < _len)
+					_alloc.construct(tmp + i, _content[i]);
+				_alloc.deallocate(_content, _len);
+				_content  = tmp;
+				_cap = new_cap;
+			}
+		}
+
+		void push_back(const value_type &value)
+		{
+			if (_len >= _cap)
+			{
+				int new_cap = _len > 0 ? _len * 2 : 1;
+				reserve(new_cap);
+			}
+			_alloc.construct(_content + len -1, value);
+			_len++;
+		}
+
+		void pop_back()
+		{
+			if (_len  > 0)
+			{
+				_alloc.destroy(_content + _len -1);
+				_len--;
+			}
+		}
+
+		iterator insert(iterator position, const value_type &value)
+		{
+			//TODO:
+		}
+
+		template<class InputIterator>
+		void assign(InputIterator first, InputIterator last){
+			clear();
+			//TODO:
+		}
 	};
 }
 

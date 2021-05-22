@@ -48,7 +48,6 @@ namespace ft
 
 		template< class T, class Container >
 		friend bool operator>=( const ft::Stack<T,Container>& lhs, const ft::Stack<T,Container>& rhs );
-
 	};
 
 	template< class T, class Container >
