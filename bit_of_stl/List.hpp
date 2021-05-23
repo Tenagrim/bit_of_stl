@@ -834,6 +834,15 @@ namespace ft {
 					 const ft::List<T,Alloc>& rhs ){
 		if(lhs._len != rhs._len)
 			return false;
+		typename ft::List<T,Alloc>::iterator it_l = lhs.begin();
+		typename ft::List<T,Alloc>::iterator it_r = rhs.begin();
+		while(it_l != lhs.end())
+		{
+			if (*it_l != *it_r)
+				return false;
+			it_l++;
+			it_r++;
+		}
 		return true;
 	}
 

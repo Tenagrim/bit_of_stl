@@ -32,22 +32,22 @@ namespace ft
 		void pop(){c.pop_front();}
 		void swap(Queue &other){c.swap(other.c);}
 
-		template< class T, class Container >
+		//template< class T, class Container >
 		friend bool operator==( const ft::Queue<T,Container>& lhs, const ft::Queue<T,Container>& rhs );
 
-		template< class T, class Container >
+		//template< class T, class Container >
 		friend bool operator!=( const ft::Queue<T,Container>& lhs, const ft::Queue<T,Container>& rhs );
 
-		template< class T, class Container >
+		//template< class T, class Container >
 		friend bool operator<( const ft::Queue<T,Container>& lhs, const ft::Queue<T,Container>& rhs );
 
-		template< class T, class Container >
+		//template< class T, class Container >
 		friend bool operator<=( const ft::Queue<T,Container>& lhs, const ft::Queue<T,Container>& rhs );
 
-		template< class T, class Container >
+		//template< class T, class Container >
 		friend bool operator>( const ft::Queue<T,Container>& lhs, const ft::Queue<T,Container>& rhs );
 
-		template< class T, class Container >
+		//template< class T, class Container >
 		friend bool operator>=( const ft::Queue<T,Container>& lhs, const ft::Queue<T,Container>& rhs );
 
 	};

@@ -1,60 +1,66 @@
 #include <List.hpp>
+#include "Vector.hpp"
 #include <list>
+#include <vector>
 //#include <list>
 #include <iostream>
 
+template <class Container>
+void print(Container c)
+{
+	std::cout << "[";
+	typename Container::iterator it = c.begin();
+	for(; it != c.end(); it++)
+		std::cout << *it << ((it + 1 == c.end()) ? "" : " , ");
+	std::cout << "]\n";
+}
+
+
+
 int	main(void)
 {
+//
+//	std::vector<int> slist;
+//	ft::Vector<int> list;
+//	ft::Vector<int> list2;
+//
+//
+//	for(int i = 0 ; i < 10; i++)
+//	{
+//		int r  = i + rand() % 10;
+//		list.push_back(r);
+//		slist.push_back(r);
+//	}
+//
+//	list2 = list;
+//	ft::Vector<int> list3(list);
+//
+//	print(list);
+//	print(list2);
+//	print(list3);
+//
+//	print(slist);
+//
 
-	std::list<int> slist;
-	ft::List<int> list;
+	//print_header("Assign");
+	int test[] = {1,5,7,8};
+	ft::Vector<int> v1;
+	std::vector<int> v2;
+	v1.assign(test, test + 4);
+	v2.assign(test, test + 4);
+
+	print(v1);
+	print(v2);
 
 
+	//check("v1 == v2", v1 == v2);
+	v1.assign((size_t)10, 9);
+	v2.assign((size_t)10, 9);
+	//check("v1 == v2", v1 == v2);
 
-	std::cout << "std front: " << slist.front() << "\n";
-	std::cout << "std back:  " << slist.back() << "\n";
-
-	std::cout << "my  front: " << list.front() << "\n";
-	std::cout << "my  back:  " << list.back() << "\n";
-
-	for(int i = 0 ; i < 10; i++)
-		list.push_back(i + rand() % 10);
-
-	ft::List<int>::iterator it = list.begin();
-	for(; it != list.end(); it++)
-		std::cout << *it << " ]\n";
-
-
-	std::cout << "front: " << list.front() << "\n";
-	std::cout << "back:  " << list.back() << "\n";
-
-	list.sort();
-	ft::List<int> list2 = list;
-
-	it = list2.begin();
-	for(; it != list2.end(); it++)
-		std::cout << *it << " ]\n";
-std::cout << "unique : ===============\n";
-	list2.unique();
-	it = list2.begin();
-	for(; it != list2.end(); it++)
-		std::cout << *it << " ]\n";
-
-	std::cout << "reverse : ===============\n";
-	list2.reverse();
-	it = list2.begin();
-	for(; it != list2.end(); it++)
-		std::cout << *it << " ]\n";
-	std::cout << "===============\n";
-	it = list2.end() - 1;
-	for(; it != list2.begin() - 1; it--)
-		std::cout << *it << " ]\n";
-
-	std::cout << "remove(10) : ===============\n";
-	list2.remove(10);
-	it = list2.begin();
-	for(; it != list2.end(); it++)
-		std::cout << *it << " ]\n";
+	std::cout << "======================\n";
+	print(v1);
+	print(v2);
 	return (0);
 
 }
