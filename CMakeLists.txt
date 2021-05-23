@@ -19,4 +19,4 @@ add_executable(bit_of_stl
         bit_of_stl/tests/queue.cpp
         bit_of_stl/tests/list.cpp
 
-        )
+        bit_of_stl/Map.hpp)
