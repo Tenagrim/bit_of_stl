@@ -15,4 +15,6 @@ add_executable(bit_of_stl
 
         bit_of_stl/tests/main.cpp
         bit_of_stl/tests/vector.cpp
+        bit_of_stl/tests/list.cpp
+
         )

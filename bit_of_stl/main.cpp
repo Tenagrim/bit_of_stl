@@ -11,11 +11,14 @@ void print(Container c)
 	std::cout << "[";
 	typename Container::iterator it = c.begin();
 	for(; it != c.end(); it++)
-		std::cout << *it << ((it + 1 == c.end()) ? "" : " , ");
+		std::cout << *it << ( " , ");
 	std::cout << "]\n";
 }
 
-
+static bool compare(int a, int b)
+{
+	return (a >= b);
+}
 
 int	main(void)
 {
@@ -42,25 +45,49 @@ int	main(void)
 //	print(slist);
 //
 
-	//print_header("Assign");
-	int test[] = {1,5,7,8};
-	ft::Vector<int> v1;
-	std::vector<int> v2;
-	v1.assign(test, test + 4);
-	v2.assign(test, test + 4);
+	ft::List<std::string> list;
 
-	print(v1);
-	print(v2);
+	print(list);
+
+/////////
+	int test[] = {0, 0, 0, 1, 2, 0, 5, 3, 4, 5, 1, -1, 0, 1};
+	ft::List<int> l1(test, test + 14);
+	std::list<int> l2(test, test + 14);
+
+	print(l1);
+	print(l2);
+	std::cout << "before unique ^ ===\n";
+
+	l1.unique();
+	l2.unique();
+
+	print(l1);
+	print(l2);
+	std::cout << "after unique ^ ===\n";
 
 
-	//check("v1 == v2", v1 == v2);
-	v1.assign((size_t)10, 9);
-	v2.assign((size_t)10, 9);
-	//check("v1 == v2", v1 == v2);
+	l1.assign(test, test + 14);
+	l2.assign(test, test + 14);
 
-	std::cout << "======================\n";
-	print(v1);
-	print(v2);
+	print(l1);
+	print(l2);
+
+	std::cout << "===\n";
+
+	l1.unique(compare);
+	l2.unique(compare);
+
+	print(l1);
+	print(l2);
+
+//////
+//	std::cout << "l1 == l2: " << (l1 == l2) << ;
+
+
+//////
+
+//	ft::List<std::string> list;
+
 	return (0);
 
 }

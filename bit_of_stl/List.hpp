@@ -15,6 +15,7 @@ namespace ft {
 		Node	*next;
 		Node	*prev;
 		T		data;
+		Node(T&data): data(data), next(0), prev(0){}
 	};
 
 #pragma region iterators
@@ -438,12 +439,13 @@ namespace ft {
 
 #pragma endregion // iterators
 
-	template<typename T, typename allocator=std::allocator<T> >
+	template<class T, class allocator=std::allocator<T> >
 	class List {
 	public:
 		typedef T value_type;
 		typedef T *pointer;
 		typedef T &reference;
+		typedef const T& const_reference;
 		typedef List<T, allocator> container_type;
 		typedef allocator allocator_type;
 		typedef size_t size_type;
@@ -453,14 +455,17 @@ namespace ft {
 		typedef ListConstReverseIterator<value_type> const_reverse_iterator;
 	private:
 		typedef Node<value_type> node;
+
 		typedef typename allocator::template rebind<Node<T> >::other
 				node_allocator_type;
 
-		size_type _len;
-		allocator_type _alloc;
-		node_allocator_type _node_alloc;
-		node *_begin;
-		node *_end;
+		typedef typename node_allocator_type::pointer _node_pointer;
+
+		size_type				_len;
+		allocator_type			_alloc;
+		node_allocator_type		_node_alloc;
+		node					*_begin;
+		node					*_end;
 
 		template<class P>
 		struct Comp_Less {
@@ -471,8 +476,24 @@ namespace ft {
 			bool operator()(const P &a, const P &b) { return a == b; }
 		};
 
-		node *_create_node(node *next, node *prev, value_type data) {
+		void _deallocate(node *n)
+		{
+			_node_alloc.destroy(n);
+			_node_alloc.deallocate(n, 1);
+//			delete n;
+		}
+
+		node *_allocate(value_type &data = value_type())
+		{
 			node *res = _node_alloc.allocate(1);
+			_node_alloc.construct(res, node(data));
+			return res;
+//			return new node;
+		}
+
+		node *_create_node(node *next, node *prev, value_type data) {
+//			node *res = _node_alloc.allocate(1);
+			node *res = _allocate(data);
 			res->data = data;
 			res->next = next;
 			res->prev = prev;
@@ -493,8 +514,8 @@ namespace ft {
 		void _delete(node *n)
 		{
 			_unlink(n);
-			_node_alloc.destroy(n);
-			_node_alloc.deallocate(n, 1);
+			//_node_alloc.destroy(n);
+			_deallocate(n);
 		}
 
 		template<class Comparator>
@@ -540,7 +561,7 @@ namespace ft {
 		template<class InputIt>
 		void assign(InputIt first, InputIt last) {
 			clear();
-			value_type  tmp = *first;
+//			value_type  tmp = *first;
 			while (first != last)
 				push_back(*(first++));
 		}
@@ -559,15 +580,17 @@ namespace ft {
 				_alloc(alloc),
 				_begin(0),
 				_end(0) {
+			_init();
+			assign(n, value);
 		}
 
 		template<class InputIt>
-		List(InputIt first, InputIt last, const allocator_type &alloc = allocator_type()) : _len(0) {
+		List(InputIt first, InputIt last, const allocator_type &alloc = allocator_type()) : _len(0), _alloc(alloc) {
 			_init();
 			assign(first, last);
 		}
 
-		List(const List &other) : _len(other._len)
+		List(const List &other) : _len(other._len), _alloc(other._alloc)
 		{
 			_init();
 			assign(other.begin(), other.end());
@@ -585,10 +608,12 @@ namespace ft {
 
 		~List() {
 			clear();
-			_node_alloc.destroy(_begin);
-			_node_alloc.deallocate(_begin, 1);
-			_node_alloc.destroy(_end);
-			_node_alloc.deallocate(_end, 1);
+			//_node_alloc.destroy(_begin); //TODO:
+//			_node_alloc.deallocate(_begin, 1);
+			//_node_alloc.destroy(_end);
+//			_node_alloc.deallocate(_end, 1);
+			_deallocate(_begin);
+			_deallocate(_end);
 		}
 
 		iterator begin() { return iterator(_begin->next); }
@@ -607,13 +632,17 @@ namespace ft {
 
 		reference back() { return _end->prev->data; }
 
+		const_reference front() const { return _begin->next->data; }
+
+		const_reference back() const { return _end->prev->data; }
+
 		void swap(List &other)
 		{
 			ft::swap(_begin, other._begin);
 			ft::swap(_end, other._end);
 			ft::swap(_len, other._len);
-			ft::swap(_alloc);
-			ft::swap(_node_alloc);
+			ft::swap(_alloc, other._alloc);
+			ft::swap(_node_alloc, other._node_alloc);
 		}
 
 		bool empty() const {
@@ -630,8 +659,9 @@ namespace ft {
 			while (p != _end) {
 				p2 = p;
 				p = p->next;
-				_node_alloc.destroy(p2);
-				_node_alloc.deallocate(p2, 1);
+				//_node_alloc.destroy(p2);
+//				_node_alloc.deallocate(p2, 1);
+				_deallocate(p2);
 			}
 			_begin->next = _end;
 			_end->prev = _begin;
@@ -656,8 +686,9 @@ namespace ft {
 			node *p;
 			if (_end->prev != _begin) {
 				p = _end->prev->prev;
-				_node_alloc.destroy(_end->prev);
-				_node_alloc.deallocate(_end->prev, 1);
+				//_node_alloc.destroy(_end->prev);
+//				_node_alloc.deallocate(_end->prev, 1);
+				_deallocate(_end->prev);
 				_end->prev = p;
 				p->next = _end;
 				_len--;
@@ -668,8 +699,9 @@ namespace ft {
 			node *p;
 			if (_end != _begin->next) {
 				p = _begin->next->next;
-				_node_alloc.destroy(_begin->next);
-				_node_alloc.deallocate(_begin->next, 1);
+				//_node_alloc.destroy(_begin->next);
+//				_node_alloc.deallocate(_begin->next, 1);
+				_deallocate(_begin->next);
 				_begin->next = p;
 				p->prev = _begin;
 				_len--;
@@ -689,7 +721,7 @@ namespace ft {
 		}
 
 		size_type max_size() const {
-			return std::numeric_limits<size_type>::max();
+			return std::numeric_limits<size_type>::max() / sizeof(Node<T>);
 		}
 
 		void sort() {
@@ -703,17 +735,20 @@ namespace ft {
 
 		iterator erase(iterator pos)
 		{
-			iterator res = pos++;
+			iterator res = pos + 1;
 			_delete(pos._node());
+			_len--;
 			return res;
 		}
 
 		iterator erase(iterator first, iterator last)
 		{
-			iterator res = last++;
+			//iterator res = last++;
 			while (first != last)
-				_delete((first++)._node);
-			return res;
+				erase(first++);
+//				_delete((first++)._node());
+//			return res;
+			return first;
 		}
 
 		void unique()
@@ -724,13 +759,14 @@ namespace ft {
 		template< class BinaryPredicate >
 		void unique( BinaryPredicate p )
 		{
-				node *prev = _begin;
+				node *prev = _begin->next;
 				node *next = prev;
 				while(next->next != _end)
 				{
 					next = next->next;
 					if (p(prev->data, next->data)){
 						_delete(next);
+						_len--;
 						next = prev;
 					}
 					else
@@ -745,7 +781,10 @@ namespace ft {
 				p2 = p;
 				p = p->next;
 				if(p2->data == value)
+				{
 					_delete(p2);
+					_len--;
+				}
 			}
 		}
 
@@ -757,7 +796,10 @@ namespace ft {
 				p2 = p;
 				p = p->next;
 				if(predicate(p2->data))
+				{
+					_len--;
 					_delete(p2);
+				}
 			}
 		}
 
@@ -784,6 +826,13 @@ namespace ft {
 				push_back(value);
 				return (end());
 			}
+			node *n = pos._node();
+			node *p = n->prev;
+			node *ins = _create_node(n, p, value);
+			n->prev = ins;
+			p->next = ins;
+			_len++;
+			return iterator(ins);
 		}
 
 		template< class InputIt >
@@ -801,16 +850,16 @@ namespace ft {
 				pos = insert(pos, value);
 		}
 
-		void splice( const_iterator pos, List& other ){
+		void splice(iterator pos, List& other ){
 			splice(pos, other, other.begin(), other.end());
 		}
 
-		void splice( const_iterator pos, List& other, const_iterator it ){
+		void splice(iterator pos, List& other, iterator it ){
 			insert(pos, *it);
 			other.erase(it);
 		}
 
-		void splice( const_iterator pos, List& other, iterator first, iterator last){
+		void splice(iterator pos, List& other, iterator first, iterator last){
 			insert(pos, first, last);
 			other.erase(first, last);
 		}
@@ -832,10 +881,10 @@ namespace ft {
 	template< class T, class Alloc >
 	bool operator==( const ft::List<T,Alloc>& lhs,
 					 const ft::List<T,Alloc>& rhs ){
-		if(lhs._len != rhs._len)
+		if(lhs.size() != rhs.size())
 			return false;
-		typename ft::List<T,Alloc>::iterator it_l = lhs.begin();
-		typename ft::List<T,Alloc>::iterator it_r = rhs.begin();
+		typename ft::List<T,Alloc>::const_iterator it_l = lhs.begin();
+		typename ft::List<T,Alloc>::const_iterator it_r = rhs.begin();
 		while(it_l != lhs.end())
 		{
 			if (*it_l != *it_r)
@@ -850,6 +899,7 @@ namespace ft {
 	bool operator!=( const ft::List<T,Alloc>& lhs,
 					 const ft::List<T,Alloc>& rhs ){
 		return !(lhs == rhs);
+		return !(lhs == rhs);
 	}
 
 	template< class T, class Alloc >
@@ -860,6 +910,8 @@ namespace ft {
 		while (pl != lhs.end() && pr != rhs.end()){
 			if (*pl < *pr)
 				return true;
+			pl++;
+			pr++;
 		}
 		return lhs.size() < rhs. size();
 	}
@@ -872,6 +924,8 @@ namespace ft {
 		while (pl != lhs.end() && pr != rhs.end()){
 			if (*pl > *pr)
 				return true;
+			pl++;
+			pr++;
 		}
 		return lhs.size() > rhs. size();
 	}
@@ -887,6 +941,12 @@ namespace ft {
 					 const ft::List<T,Alloc>& rhs ){
 		return !(lhs > rhs);
 	}
+
+	template <class T, class Alloc>
+	void swap(List<T, Alloc> &a, List<T, Alloc> &b)
+	{
+		a.swap(b);
+	};
 }
 
 #endif //LIST_HPP
