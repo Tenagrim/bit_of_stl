@@ -26,7 +26,7 @@ namespace ft
 		}
 		size_type size(){return c.size();}
 		bool empty(){return c.empty();}
-		value_type &top(){return c.front;}
+		value_type &top(){return c.front();}
 		void push(const value_type &value){c.push_front(value);}
 		void pop(){c.pop_front();}
 		void swap(Stack &other){c.swap(other.c);}
