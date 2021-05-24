@@ -459,7 +459,7 @@ namespace ft {
 		typedef typename allocator::template rebind<Node<T> >::other
 				node_allocator_type;
 
-		typedef typename node_allocator_type::pointer _node_pointer;
+		//typedef typename node_allocator_type::pointer _node_pointer;
 
 		size_type				_len;
 		allocator_type			_alloc;
