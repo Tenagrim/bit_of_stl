@@ -21,7 +21,7 @@ namespace ft {
 		second_type		second;
 
 		Pair(): first(), second(){}
-		Pair(const T1 &first, const T1 &second): first(first), second(second){}
+		Pair(const T1 &first, const T2 &second): first(first), second(second){}
 		Pair &operator=(const Pair &other) { first = other.first; second = other.second;}
 		void swap(Pair &other) {ft::swap(first, other.first); ft::swap(second, other.second);}
 	};
