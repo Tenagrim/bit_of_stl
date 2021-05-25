@@ -338,6 +338,11 @@ namespace ft
 			_len--;
 		}
 
+		void _delete_node(node *n)
+		{
+
+		}
+
 		node *_find(node *n, const key_type & key) const
 		{
 			if(!n)
@@ -366,9 +371,9 @@ namespace ft
 		{
 			node *p = _find(_root,key);
 			if(p)
-				return p->value->second;
+				return p->value.second;
 			else
-				return mapped_type (); /// <-----------------
+				return _insert(_allocate(value_type(key, mapped_type())))->value.second;
 		}
 		///
 
@@ -399,7 +404,6 @@ namespace ft
 			if(p)
 				return Pair<iterator, bool>(iterator(p), false);
 			else
-//				return Pair<iterator, bool>(iterator(), true);
 				return Pair<iterator, bool>(iterator(_insert(_allocate(value))), true);
 		}
 		///

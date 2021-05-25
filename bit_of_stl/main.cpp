@@ -59,6 +59,12 @@ int	main(void)
 	m.insert(ft::Pair<int,int>(200,3000));
 
 	print_m(m);
+
+	std::cout << "m[200]" << m[200] << "\n";
+	std::cout << "m[300]" << m[300] << "\n";
+
+	print_m(m);
+
 	return (0);
 
 }
