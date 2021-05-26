@@ -373,11 +373,11 @@ namespace ft {
 		}
 	public:
 		explicit Vector(const allocator_type &alloc = allocator_type()) :
-		_len(0), _cap(0), _content(0), _alloc(alloc) {}
+		   _alloc(alloc), _len(0), _cap(0), _content(0) {}
 		
 		explicit Vector(size_type n, const value_type &value = value_type (),
 				  const allocator_type &alloc = allocator_type()) :
-				_len(0), _cap(0), _content(0), _alloc(alloc) {
+				   _alloc(alloc), _len(0), _cap(0), _content(0) {
 			_content = _alloc.allocate(n);
 			T	*p = _content;
 			while(n--)
@@ -454,7 +454,7 @@ namespace ft {
 
 		void clear()
 		{
-			for(int i = 0; i < _len; i++)
+			for(size_type i = 0; i < _len; i++)
 				_alloc.destroy(_content + i);
 			_len = 0;
 		}
@@ -483,7 +483,7 @@ namespace ft {
 		{
 			if (new_cap > max_size())
 				throw (std::length_error("new_cap is too big"));
-			int i = -1;
+			size_type i = -1;
 			if (new_cap > _cap)
 			{
 				T* tmp = _alloc.allocate(new_cap);
@@ -522,9 +522,9 @@ namespace ft {
 
 		iterator insert(iterator position, const value_type &value)
 		{
-			int pos =  &(*position) - _content;
+			size_type pos =  &(*position) - _content;
 			_double_cap_if_need();
-			for(int i = _len; i > pos; i--)
+			for(size_type i = _len; i > pos; i--)
 				_content[i] = _content[i -1];
 			_alloc.construct(_content + pos, value);
 			_len++;

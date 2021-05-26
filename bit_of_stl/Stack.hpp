@@ -17,7 +17,7 @@ namespace ft
 	protected:
 		container_type 			c;
 	public:
-		explicit Stack(const container_type &cnt = container_type()){}
+		explicit Stack(const container_type &cnt = container_type()) : c(cnt){}
 		Stack(const Stack &other) : c(other.c){}
 		~Stack(){}
 		Stack &operator=(const Stack &other){

@@ -17,7 +17,7 @@ namespace ft
 	protected:
 		container_type 			c;
 	public:
-		explicit Queue(const container_type &cnt = container_type()){}
+		explicit Queue(const container_type &cnt = container_type()):c(cnt){}
 		Queue(const Queue &other) : c(other.c){}
 		~Queue(){}
 		Queue &operator=(const Queue &other){

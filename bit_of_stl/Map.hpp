@@ -640,7 +640,7 @@ namespace ft
 		{
 			node *n = _find(_root, value.first);
 			if (n)
-				return iterator(n);
+				return iterator(hint);
 			else
 				return iterator(_insert(_allocate(value)));
 		}

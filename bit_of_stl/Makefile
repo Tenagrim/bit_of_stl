@@ -1,6 +1,21 @@
 NAME=ex
-SRC=main.cpp
-HPP=List.hpp List2.hpp
+SRC= \
+tests/main.cpp \
+tests/list.cpp \
+tests/Map.cpp \
+tests/queue.cpp \
+tests/stack.cpp \
+tests/vector.cpp \
+
+HPP= \
+List.hpp \
+Map.hpp \
+Queue.hpp \
+Stack.hpp \
+tests/tests.hpp \
+Utils.hpp \
+Vector.hpp
+
 CC= clang++
 OBJ=$(SRC:.cpp=.o)
 FLAGS= -g -I . -Wall -Wextra  # -Werror 
