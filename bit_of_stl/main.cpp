@@ -41,9 +41,7 @@ int	main(void)
 
 	print_m(m);
 
-	for (int i = 0 ; i < 5; i++)
-		m.deb_insert();
-		/*
+
 	m[0] =0;
 
 	m[5] =0;
@@ -53,7 +51,7 @@ int	main(void)
 	m[9] =0;
 	m[6] =0;
 	m[15] =0;
-*/
+
 	print_m(m);
 
 	ft::Map<int,int>::iterator  p =m.lower_bound(76);

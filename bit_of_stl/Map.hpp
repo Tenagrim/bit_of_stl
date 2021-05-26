@@ -118,11 +118,11 @@ namespace ft
 			return tmp;
 		}
 
-		virtual value_type &operator*() {
+		value_type &operator*() {
 			return this->_p->value;
 		}
 
-		virtual value_type *operator->() {
+		value_type *operator->() {
 			return &this->_p->value;
 		}
 
@@ -214,11 +214,11 @@ namespace ft
 		MapConstIterator &operator=(const MapConstIterator &other){this->_p = other._p;}
 		virtual ~MapConstIterator(){}
 
-		const value_type &operator*() {
+		const value_type &operator*() const {
 			return this->_p->value;
 		}
 
-		const value_type *operator->() {
+		const value_type *operator->() const {
 			return &this->_p->value;
 		}
 
@@ -247,10 +247,10 @@ namespace ft
 			this->_p = this->_next(this->_p);
 			return *this;
 		}
-		const value_type &operator*() {
+		const value_type &operator*() const{
 			return this->_p->value;
 		}
-		const value_type *operator->() {
+		const value_type *operator->() const{
 			return &this->_p->value;
 		}
 	};
@@ -410,9 +410,11 @@ namespace ft
 			if(n->parent)
 			{
 				if (n->parent->left == n)
-					n->parent->left =subtree;
+					n->parent->left = subtree;
 				else if (n->parent->right == n)
-					n->parent->right =subtree;
+					n->parent->right = subtree;
+				if(subtree)
+					subtree->parent = n->parent;
 			}
 		}
 
@@ -511,7 +513,7 @@ namespace ft
 		}
 		node *_upper_bound(const key_type &key) const
 		{
-			node *n = _lower_bound(_root, key);
+			node *n = _lower_bound(key);
 			if (n->value.first == key )
 				return _next_node(n);
 			return n;
@@ -557,7 +559,7 @@ namespace ft
 		}
 
 		explicit Map(const Map<Key, T> &other)
-				: _len(0), _alloc(other.alloc), _compare(other.comp),_v_compare(value_compare(other.comp))
+				: _len(0), _alloc(other._alloc), _compare(other._compare),_v_compare(value_compare(other._compare))
 		{
 			_init();
 			insert(other.begin(), other.end());
@@ -611,7 +613,7 @@ namespace ft
 		#pragma region capacity
 		size_type size() const{return _len;}
 		bool empty() const{return _len == 0;}
-		size_type max_size() const {return std::numeric_limits<size_type>::max() / sizeof(Node<T>);}
+		size_type max_size() const {return std::numeric_limits<size_type>::max() / sizeof(node);}
 		#pragma endregion // capacity
 		///
 
@@ -634,20 +636,20 @@ namespace ft
 				return Pair<iterator, bool>(iterator(_insert(_allocate(value))), true);
 		}
 
-		iterator insert( iterator hint, const value_type& value )
+		iterator insert(iterator hint, const value_type& value )
 		{
 			node *n = _find(_root, value.first);
-			if (n != _end)
+			if (n)
 				return iterator(n);
 			else
 				return iterator(_insert(_allocate(value)));
 		}
 		template< class InputIt >
-		void insert( InputIt first, InputIt last )
+		void insert(InputIt first, InputIt last)
 		{
 			while(first != last)
 			{
-				insert(*first);
+				insert(value_type(first->first, first->second));
 				first++;
 			}
 		}
@@ -671,10 +673,7 @@ namespace ft
 		void erase( iterator first, iterator last )
 		{
 			while(first != last)
-			{
-				erase(first);
-				first++;
-			}
+				erase(first++);
 		}
 		size_type erase( const key_type& key)
 		{
@@ -745,13 +744,71 @@ namespace ft
 		#pragma endregion // observers
 		///
 
-		/// Trash //TODO: remove
-		void deb_insert()
-		{
-			node *n = _insert(_allocate(Pair<int,int>(rand()%100, rand()%100)));
-			std::cout << "[" << n->value.first << "|"<<n->value.second<<"] \n";
-		}
-		///
 	};
+
+	#pragma region not_member_operators
+	template< class T, class Alloc >
+	bool operator==( const ft::Map<T,Alloc>& lhs,
+					 const ft::Map<T,Alloc>& rhs ){
+		if(lhs.size() != rhs.size())
+			return false;
+		typename ft::Map<T,Alloc>::const_iterator it_l = lhs.begin();
+		typename ft::Map<T,Alloc>::const_iterator it_r = rhs.begin();
+		while(it_l != lhs.end())
+		{
+			if (*it_l != *it_r)
+				return false;
+			it_l++;
+			it_r++;
+		}
+		return true;
+	}
+
+	template< class T, class Alloc >
+	bool operator!=( const ft::Map<T,Alloc>& lhs,
+					 const ft::Map<T,Alloc>& rhs ){
+		return !(lhs == rhs);
+	}
+
+	template< class T, class Alloc >
+	bool operator<( const ft::Map<T,Alloc>& lhs,
+					const ft::Map<T,Alloc>& rhs ){
+		typename ft::Map<T,Alloc>::const_iterator pl = lhs.begin();
+		typename ft::Map<T,Alloc>::const_iterator pr = rhs.begin();
+		while (pl != lhs.end() && pr != rhs.end()){
+			if (*pl < *pr)
+				return true;
+			pl++;
+			pr++;
+		}
+		return lhs.size() < rhs.size();
+	}
+
+	template< class T, class Alloc >
+	bool operator>( const ft::Map<T,Alloc>& lhs,
+					const ft::Map<T,Alloc>& rhs ){
+		typename ft::Map<T,Alloc>::const_iterator pl = lhs.begin();
+		typename ft::Map<T,Alloc>::const_iterator pr = rhs.begin();
+		while (pl != lhs.end() && pr != rhs.end()){
+			if (*pl > *pr)
+				return true;
+			pl++;
+			pr++;
+		}
+		return lhs.size() > rhs.size();
+	}
+
+	template< class T, class Alloc >
+	bool operator>=( const ft::Map<T,Alloc>& lhs,
+					 const ft::Map<T,Alloc>& rhs ){
+		return !(lhs < rhs);
+	}
+
+	template< class T, class Alloc >
+	bool operator<=( const ft::Map<T,Alloc>& lhs,
+					 const ft::Map<T,Alloc>& rhs ){
+		return !(lhs > rhs);
+	}
+	#pragma endregion // not_member_operators
 }
 #endif //MAP_HPP
