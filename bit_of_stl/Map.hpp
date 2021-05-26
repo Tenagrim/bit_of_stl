@@ -546,11 +546,38 @@ namespace ft
 		#pragma region constructor
 		explicit Map(const key_compare &comp = key_compare(), const allocator_type alloc = allocator_type()) :
 		_len(0), _compare(comp), _alloc(alloc), _v_compare(value_compare(comp)){_init();}
+
+		template <class InputIterator>
+		Map(InputIterator first, InputIterator last, const key_compare &comp = key_compare(),
+	  		const allocator_type alloc = allocator_type())
+				: _alloc(alloc), _compare(comp),_v_compare(value_compare(comp)), _len(0)
+		{
+			_init();
+			insert(first, last);
+		}
+
+		explicit Map(const Map<Key, T> &other)
+				: _len(0), _alloc(other.alloc), _compare(other.comp),_v_compare(value_compare(other.comp))
+		{
+			_init();
+			insert(other.begin(), other.end());
+		};
+		Map &operator=(const Map<Key, T> &other)
+		{
+			clear();
+			insert(other.begin(), other.end());
+			return (*this);
+		};
+
+		allocator_type get_allocator() const
+		{
+			return _alloc;
+		}
 		#pragma endregion // constructor
 		///
 
 		/// Destructor
-		~Map(){}
+		~Map(){ _delete_subtree(_root);}
 		///
 
 		/// Element access
@@ -609,15 +636,54 @@ namespace ft
 
 		iterator insert( iterator hint, const value_type& value )
 		{
-
+			node *n = _find(_root, value.first);
+			if (n != _end)
+				return iterator(n);
+			else
+				return iterator(_insert(_allocate(value)));
 		}
-
 		template< class InputIt >
 		void insert( InputIt first, InputIt last )
 		{
-
+			while(first != last)
+			{
+				insert(*first);
+				first++;
+			}
 		}
-		#pragma endregion // modifiers
+
+		void swap( Map& other)
+		{
+			ft::swap(_alloc, other._alloc);
+			ft::swap(_node_alloc, other._node_alloc);
+			ft::swap(_compare, other._compare);
+			ft::swap(_v_compare, other._v_compare);
+			ft::swap(_len, other._len);
+			ft::swap(_root, other._root);
+			ft::swap(_begin, other._begin);
+			ft::swap(_end, other._end);
+		}
+
+		void erase( iterator pos )
+		{
+			_delete_node(pos._node());
+		}
+		void erase( iterator first, iterator last )
+		{
+			while(first != last)
+			{
+				erase(first);
+				first++;
+			}
+		}
+		size_type erase( const key_type& key)
+		{
+			iterator p = find(key);
+			if (p != end())
+				erase(p);
+			return 1;
+		}
+		#pragma endregion /// modifiers
 		///
 
 		/// Lookup
