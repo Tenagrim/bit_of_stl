@@ -7,6 +7,8 @@
 #include <memory>
 #include "Utils.hpp"
 
+
+#include <iostream> // TODO: remove
 namespace ft
 {
 	template <class T>
@@ -23,7 +25,6 @@ namespace ft
 		bool	is_black(){return !red;}
 	};
 
-
 #pragma region iterators
 	template<class T>
 	class MapIteratorBase{
@@ -36,7 +37,7 @@ namespace ft
 		explicit MapIteratorBase(node_pointer p) : _p(p){}
 		MapIteratorBase(const MapIteratorBase &other) : _p(other._p){}
 		MapIteratorBase() : _p(0){}
-		~MapIteratorBase(){}
+		virtual ~MapIteratorBase(){}
 		MapIteratorBase & operator=(const MapIteratorBase &other){_p = other._p;}
 
 		node_pointer _next(node_pointer p)
@@ -89,9 +90,9 @@ namespace ft
 		MapIterator(node_pointer p) : MapIteratorBase<T>(p){}
 		MapIterator(const MapIterator &other) : MapIteratorBase<T>(other) {}
 		MapIterator &operator=(const MapIterator &other){this->_p = other._p;}
-		~MapIterator(){}
+		virtual ~MapIterator(){}
 
-		MapIterator &operator++()
+		virtual MapIterator &operator++()
 		{
 			this->_p = this->_next(this->_p);
 			return *this;
@@ -103,7 +104,8 @@ namespace ft
 			this->operator++();
 			return tmp;
 		}
-		MapIterator &operator--()
+
+		virtual MapIterator &operator--()
 		{
 			this->_p = this->_prev(this->_p);
 			return *this;
@@ -116,11 +118,11 @@ namespace ft
 			return tmp;
 		}
 
-		value_type &operator*() {
+		virtual value_type &operator*() {
 			return this->_p->value;
 		}
 
-		value_type *operator->() {
+		virtual value_type *operator->() {
 			return &this->_p->value;
 		}
 
@@ -172,8 +174,87 @@ namespace ft
 		}
 	};
 
-#pragma endregion //iterators
 
+	template<class T>
+	class MapReverseIterator : public MapIterator<T>
+	{
+	private:
+		typedef M_Node <T>	*node_pointer;
+		typedef T			value_type;
+	public:
+		MapReverseIterator(){}
+		MapReverseIterator(node_pointer p) : MapIterator<T>(p){}
+		MapReverseIterator(const MapReverseIterator &other) : MapIterator<T>(other) {}
+		MapReverseIterator &operator=(const MapReverseIterator &other){this->_p = other._p;}
+		virtual ~MapReverseIterator(){}
+
+		MapReverseIterator &operator++()
+		{
+			this->_p = this->_prev(this->_p);
+			return *this;
+		}
+		MapReverseIterator &operator--()
+		{
+			this->_p = this->_next(this->_p);
+			return *this;
+		}
+	};
+
+
+	template<class T>
+	class MapConstIterator : public MapIterator<T>
+	{
+	private:
+		typedef M_Node <T>	*node_pointer;
+		typedef T			value_type;
+	public:
+		MapConstIterator(){}
+		MapConstIterator(node_pointer p) : MapIterator<T>(p){}
+		MapConstIterator(const MapConstIterator &other) : MapIterator<T>(other) {}
+		MapConstIterator &operator=(const MapConstIterator &other){this->_p = other._p;}
+		virtual ~MapConstIterator(){}
+
+		const value_type &operator*() {
+			return this->_p->value;
+		}
+
+		const value_type *operator->() {
+			return &this->_p->value;
+		}
+
+	};
+
+	template<class T>
+	class MapConstReverseIterator : public MapIterator<T>
+	{
+	private:
+		typedef M_Node <T>	*node_pointer;
+		typedef T			value_type;
+	public:
+		MapConstReverseIterator(){}
+		MapConstReverseIterator(node_pointer p) : MapIterator<T>(p){}
+		MapConstReverseIterator(const MapConstReverseIterator &other) : MapIterator<T>(other) {}
+		MapConstReverseIterator &operator=(const MapConstReverseIterator &other){this->_p = other._p;}
+		virtual ~MapConstReverseIterator(){}
+
+		MapConstReverseIterator &operator++()
+		{
+			this->_p = this->_prev(this->_p);
+			return *this;
+		}
+		MapConstReverseIterator &operator--()
+		{
+			this->_p = this->_next(this->_p);
+			return *this;
+		}
+		const value_type &operator*() {
+			return this->_p->value;
+		}
+		const value_type *operator->() {
+			return &this->_p->value;
+		}
+	};
+#pragma endregion //iterators
 
 	template<
 			class Key,
@@ -183,14 +264,17 @@ namespace ft
 	>
 	class Map{
 	public:
-		typedef Key								key_type;
-		typedef	T								mapped_type;
-		typedef	Compare							key_compare;
-		typedef size_t 							size_type;
-		typedef Allocator						allocator_type;
-		typedef ft::Pair<key_type, mapped_type>	value_type;
-		typedef M_Node<value_type>				node;
-		typedef MapIterator<value_type>			iterator;
+		typedef Key									key_type;
+		typedef	T									mapped_type;
+		typedef	Compare								key_compare;
+		typedef size_t 								size_type;
+		typedef Allocator							allocator_type;
+		typedef ft::Pair<key_type, mapped_type>		value_type;
+		typedef M_Node<value_type>					node;
+		typedef MapIterator<value_type>				iterator;
+		typedef MapReverseIterator<value_type>		reverse_iterator;
+		typedef MapConstIterator<value_type>		const_iterator;
+		typedef MapConstReverseIterator<value_type>	const_reverse_iterator;
 
 		class value_compare{
 			friend class Map<key_type , mapped_type, key_compare, allocator_type>;
@@ -321,14 +405,22 @@ namespace ft
 			return n;
 		}
 
+		void _unlink_parent(node *n, node *subtree = 0)
+		{
+			if(n->parent)
+			{
+				if (n->parent->left == n)
+					n->parent->left =subtree;
+				else if (n->parent->right == n)
+					n->parent->right =subtree;
+			}
+		}
+
 		void _delete_subtree(node *n)
 		{
 			if(!n)
 				return;
-			if (n->parent && n->parent->left == n)
-				n->parent->left =0;
-			if (n->parent && n->parent->right == n)
-				n->parent->right =0;
+			_unlink_parent(n);
 
 			if(n->left)
 				_delete_subtree(n->left);
@@ -338,9 +430,63 @@ namespace ft
 			_len--;
 		}
 
+		node *_next_node(node *p) const
+		{
+			node * next;
+			if(p->right)
+			{
+				next = p->right;
+				while (next->left)
+					next = next->left;
+			}
+			else
+			{
+				next = p;
+				while (next->parent && next == next->parent->right)
+					next = next->parent;
+				next = next->parent;
+			}
+			return next;
+		}
+
+		node * _prev_node(node *p) const
+		{
+			node * prev;
+			if(p->left)
+			{
+				prev = p->left;
+				while (prev->right)
+					prev = prev->right;
+			}
+			else
+			{
+				prev = p;
+				while (prev->parent && prev == prev->parent->left)
+					prev = prev->parent;
+				prev = prev->parent;
+			}
+			return prev;
+		}
+
 		void _delete_node(node *n)
 		{
-
+			if(!n->left && !n->right)
+				_unlink_parent(n);
+			else if (n->left && !n->right)
+				_unlink_parent(n, n->left);
+			else if(!n->left && n->right)
+				_unlink_parent(n, n->right);
+			else
+			{
+				node *next = _next_node(n);
+				if(!next)
+					next = _prev_node(n);
+				ft::swap(n->value, next->value);
+				_delete_node(next);
+				return;
+			}
+			_deallocate(n);
+			_len--;
 		}
 
 		node *_find(node *n, const key_type & key) const
@@ -355,18 +501,60 @@ namespace ft
 				return _find(n->right, key);
 		}
 
+		node *_lower_bound(const key_type &key) const
+		{
+			node *n = _closest_lower(_root, key);
+			if (n->value.first == key || n ==_end)
+				return n;
+			else
+				return _next_node(n);
+		}
+		node *_upper_bound(const key_type &key) const
+		{
+			node *n = _lower_bound(_root, key);
+			if (n->value.first == key )
+				return _next_node(n);
+			return n;
+		}
+		node *_closest_lower(node *n, const key_type &key) const
+		{
+			if(!n)
+				return 0;
+			else if (n->value.first == key)
+				return n;
+			else if(_compare(key,n->value.first))
+			{
+				std::cout << "left : "<< n->value.first << "\n";
+				if(n->left)
+					return _closest_lower(n->left, key);
+				else if(n->parent)
+					return n->parent;
+				else
+					return _end;
+			}
+			else
+			{
+				std::cout << "right : "<< n->value.first << "\n";
+				if(n->right)
+					return _closest_lower(n->right, key);
+				else return n;
+			}
+		}
+
 	public:
+		/// Constructor
+		#pragma region constructor
 		explicit Map(const key_compare &comp = key_compare(), const allocator_type alloc = allocator_type()) :
 		_len(0), _compare(comp), _alloc(alloc), _v_compare(value_compare(comp)){_init();}
+		#pragma endregion // constructor
+		///
+
+		/// Destructor
 		~Map(){}
-
-		key_compare key_comp() const
-		{return _compare;}
-
-		value_compare value_comp() const
-		{return (value_compare(key_compare()));}
+		///
 
 		/// Element access
+		#pragma region element_access
 		mapped_type &operator[](const key_type &key)
 		{
 			node *p = _find(_root,key);
@@ -375,21 +563,33 @@ namespace ft
 			else
 				return _insert(_allocate(value_type(key, mapped_type())))->value.second;
 		}
+		#pragma endregion // element_access
 		///
 
-
 		/// Iterators
+		#pragma region iterators
 		iterator begin(){return iterator(_begin->parent);}
 		iterator end(){return iterator(_end);}
+		const_iterator begin() const {return const_iterator(_begin->parent);}
+		const_iterator end() const {return const_iterator(_end);}
+
+		reverse_iterator rbegin(){return reverse_iterator(_begin);}
+		reverse_iterator rend(){return reverse_iterator(_end->parent);}
+		const_reverse_iterator rbegin() const {return const_reverse_iterator(_begin);}
+		const_reverse_iterator rend() const {return const_reverse_iterator(_end->parent);}
+		#pragma endregion // iterators
 		///
 
 		/// Capacity
+		#pragma region capacity
 		size_type size() const{return _len;}
 		bool empty() const{return _len == 0;}
 		size_type max_size() const {return std::numeric_limits<size_type>::max() / sizeof(Node<T>);}
+		#pragma endregion // capacity
 		///
 
 		/// Modifiers
+		#pragma region modifiers
 		void clear()
 		{
 			_detach_borders();
@@ -406,9 +606,22 @@ namespace ft
 			else
 				return Pair<iterator, bool>(iterator(_insert(_allocate(value))), true);
 		}
+
+		iterator insert( iterator hint, const value_type& value )
+		{
+
+		}
+
+		template< class InputIt >
+		void insert( InputIt first, InputIt last )
+		{
+
+		}
+		#pragma endregion // modifiers
 		///
 
 		/// Lookup
+		#pragma region lookup
 		iterator find(const key_type &key)
 		{
 			if(_len==0)
@@ -418,16 +631,61 @@ namespace ft
 				return (iterator(n));
 			return end();
 		}
+
+		size_type	count(const key_type &value)
+		{
+			return static_cast<bool>(_find(_root,value) != 0);
+		}
+
+		iterator lower_bound(const key_type &key)
+		{
+			return iterator(_lower_bound(key));
+		}
+
+		const_iterator lower_bound(const key_type &key) const
+		{
+			return const_iterator (_lower_bound(key));
+		}
+
+		iterator upper_bound(const key_type &key)
+		{
+			return iterator(_upper_bound(key));
+		}
+
+		const_iterator upper_bound(const key_type &key) const
+		{
+			return const_iterator (_upper_bound(key));
+		}
+
+		ft::Pair<iterator,iterator> equal_range( const key_type & key )
+		{
+			return Pair<iterator,iterator>(iterator(_lower_bound(key)), iterator(_upper_bound(key)));
+		}
+
+		ft::Pair<const_iterator,const_iterator> equal_range( const key_type & key ) const
+		{
+			return Pair<const_iterator,const_iterator>(const_iterator(_lower_bound(key)), const_iterator(_upper_bound(key)));
+		}
+		#pragma endregion
 		///
 
+		/// Observers
+		#pragma region observers
+		key_compare key_comp() const
+		{return _compare;}
+
+		value_compare value_comp() const
+		{return (value_compare(key_compare()));}
+		#pragma endregion // observers
+		///
 
 		/// Trash //TODO: remove
 		void deb_insert()
 		{
-			_insert(_allocate(Pair<int,int>(rand()%100, rand()%100)));
+			node *n = _insert(_allocate(Pair<int,int>(rand()%100, rand()%100)));
+			std::cout << "[" << n->value.first << "|"<<n->value.second<<"] \n";
 		}
 		///
-
 	};
 }
 #endif //MAP_HPP

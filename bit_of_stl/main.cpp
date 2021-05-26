@@ -43,27 +43,28 @@ int	main(void)
 
 	for (int i = 0 ; i < 5; i++)
 		m.deb_insert();
+		/*
+	m[0] =0;
 
+	m[5] =0;
+	m[4] =0;
+	m[10] =0;
+	m[8] =0;
+	m[9] =0;
+	m[6] =0;
+	m[15] =0;
+*/
 	print_m(m);
 
-	ft::Map<int,int>::iterator p =m.find(79);
+	ft::Map<int,int>::iterator  p =m.lower_bound(76);
 
-	std::cout << "find(9): ";
+	std::cout << "lower_bound: ";
 	if (p == m.end())
 		std::cout << "not found\n";
 	else
-		std::cout  << p->second << "\n";
+		std::cout  << p->first << "\n";
 
-	m.clear();
 
-	m.insert(ft::Pair<int,int>(200,3000));
-
-	print_m(m);
-
-	std::cout << "m[200]" << m[200] << "\n";
-	std::cout << "m[300]" << m[300] << "\n";
-
-	print_m(m);
 
 	return (0);
 
